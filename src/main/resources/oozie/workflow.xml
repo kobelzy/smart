@@ -1,0 +1,158 @@
+<workflow-app name="ynsf2Workflow" xmlns="uri:oozie:workflow:0.5">
+    <start to="spark1"/>
+    <kill name="Kill">
+        <message>操作失败，错误消息[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="sqoop1">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>default</value>
+                </property>
+            </configuration>
+            <arg>import</arg>
+            <arg>--connect</arg>
+            <arg>${mysqlurl}</arg>
+            <arg>--username</arg>
+            <arg>${mysqlname}</arg>
+            <arg>--password</arg>
+            <arg>${mysqlpsw}</arg>
+            <arg>-m</arg>
+            <arg>1</arg>
+            <arg>--table</arg>
+            <arg>base_six_indicator_weight</arg>
+            <arg>--target-dir</arg>
+            <arg>/user/tescomm/ynsf2/base_six_indicator_weight</arg>
+            <arg>--delete-target-dir</arg>
+        </sqoop>
+        <ok to="sqoop2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="sqoop2">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>default</value>
+                </property>
+            </configuration>
+            <arg>import</arg>
+            <arg>--connect</arg>
+            <arg>${mysqlurl}</arg>
+            <arg>--username</arg>
+            <arg>${mysqlname}</arg>
+            <arg>--password</arg>
+            <arg>${mysqlpsw}</arg>
+            <arg>-m</arg>
+            <arg>1</arg>
+            <arg>--table</arg>
+            <arg>base_dicts</arg>
+            <arg>--target-dir</arg>
+            <arg>/user/tescomm/ynsf2/base_dicts</arg>
+            <arg>--delete-target-dir</arg>
+        </sqoop>
+        <ok to="sqoop3"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="sqoop3">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>default</value>
+                </property>
+            </configuration>
+            <arg>import</arg>
+            <arg>--connect</arg>
+            <arg>${mysqlurl}</arg>
+            <arg>--username</arg>
+            <arg>${mysqlname}</arg>
+            <arg>--password</arg>
+            <arg>${mysqlpsw}</arg>
+            <arg>-m</arg>
+            <arg>1</arg>
+            <arg>--table</arg>
+            <arg>base_building</arg>
+            <arg>--target-dir</arg>
+            <arg>/user/tescomm/ynsf2/base_building</arg>
+            <arg>--delete-target-dir</arg>
+        </sqoop>
+        <ok to="sqoop4"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="sqoop4">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>default</value>
+                </property>
+            </configuration>
+            <arg>import</arg>
+            <arg>--connect</arg>
+            <arg>${mysqlurl}</arg>
+            <arg>--username</arg>
+            <arg>${mysqlname}</arg>
+            <arg>--password</arg>
+            <arg>${mysqlpsw}</arg>
+            <arg>-m</arg>
+            <arg>1</arg>
+            <arg>--table</arg>
+            <arg>base_station</arg>
+            <arg>--target-dir</arg>
+            <arg>/user/tescomm/ynsf2/base_station</arg>
+            <arg>--delete-target-dir</arg>
+        </sqoop>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <!--<action name="spark1">
+        <spark xmlns="uri:oozie:spark-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>spark://${sparkMaster}</master>
+            <mode>client</mode>
+            <name>ynsf2</name>
+            <class>com.tescomm.ynsf.modules.Assessment</class>
+            <jar>/lib/ynsf2.jar</jar>
+            <spark-opts>&#45;&#45;executor-memory 30G &#45;&#45;total-executor-cores 20</spark-opts>
+            <arg>${isautomatic}</arg>
+            <arg>${schemeName}</arg>
+            <arg>${taskId}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>-->
+    <action name="spark1">
+        <spark xmlns="uri:oozie:spark-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>spark://${sparkMaster}</master>
+            <mode>client</mode>
+            <name>ynsf2</name>
+            <class>com.tescomm.ynsf.modules.das.Core</class>
+            <jar>/lib/ynsf2.jar</jar>
+            <spark-opts>--num-executors 15 --executor-memory 20G --executor-cores 4 --driver-memory 20G</spark-opts>
+            <arg>${isautomatic}</arg>
+            <arg>${schemeName}</arg>
+            <arg>${taskId}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>
