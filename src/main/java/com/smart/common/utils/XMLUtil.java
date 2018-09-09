@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by licheng on 2017/8/21.
+ * Created by lzy on 2017/8/21.
  */
 public class XMLUtil<T> {
     private Document doc;
